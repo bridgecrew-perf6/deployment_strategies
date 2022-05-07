@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuber-v2
+  labels:
+    app: kuber
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kuber
+      version: v2.0
+  template:
+    metadata:
+      labels:
+        app: kuber
+        version: v2.0
+    spec:
+      containers:
+      - name: kuber-app
+        image: bokovets/kuber:v2.0
+        ports:
+        - containerPort: 8000
