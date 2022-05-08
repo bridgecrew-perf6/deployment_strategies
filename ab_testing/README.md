@@ -1,54 +1,27 @@
-# Recreate deployment
+# A/B testing using Istio
 
-> Version A is terminated then version B is rolled out.
+> Version B is released to a subset of users under specific condition.
 
-![kubernetes recreate deployment](grafana-recreate.png)
+![kubernetes ab-testing deployment](grafana-ab-testing.png)
 
-The recreate strategy is a dummy deployment which consists of shutting down
-version A then deploying version B after version A is turned off. This technique
-implies downtime of the service that depends on both shutdown and boot duration
-of the application.
+A/B testing deployments consists of routing a subset of users to a new
+functionality under specific conditions. It is usually a technique for making
+business decisions based on statistics rather than a deployment strategy.
+However, it is related and can be implemented by adding extra functionality to a
+canary deployment so we will briefly discuss it here.
 
-## Steps to follow
+This technique is widely used to test conversion of a given feature and only
+roll-out the version that converts the most.
 
-1. version 1 is service traffic
-1. delete version 1
-1. deploy version 2
-1. wait until all replicas are ready
+Here is a list of conditions that can be used to distribute traffic amongst the
+versions:
 
-## In practice
+- Weight
+- Cookie value
+- Query parameters
+- Geolocalisation
+- Technology support: browser version, screen size, operating system, etc.
+- Language
 
-```bash
-# Deploy the first application
-$ kubectl apply -f kuber-deployment-v1.yaml
 
-# Test if the deployment was successful
-$ curl $(minikube service kuber-service --url)
-
-# To see the deployment in action, open a new terminal and run the following command
-$ watch kubectl get po --watch
-
-# Then deploy version 2 of the application
-$ kubectl apply -f kuber-deployment-v2.yaml
-
-# Test the second deployment progress
-service=$(minikube service kuber-service --url)
-while true; do curl "$service"; sleep 2; echo; done
-
-# Cleanup
-$ kubectl delete all -l app=my-app
-```
-
-## Visualize step by step 
-
-### Init state
-
-![recreate init state](./recreate_init_state.png)
-
-### Step 1
-
-![recreate step 1](./recreate_step_1.png)
-
-### Step 2
-
-![recreate step 2](./recreate_step_2.png)
+![A/B testing model](./ab_testing.png)
